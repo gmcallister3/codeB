@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,6 +82,7 @@ public class Connection {
                 System.out.println("Recieved message: " + line);
                 if(line.length() > 15 && line.substring(0,15).equals("SECURITIES_OUT ")) {
                     String[] strs = line.substring(15).split(" ");
+                    trial = 100;
                     for(int i = 0; i < strs.length; i+=4) {
                         String ticker = strs[i];
                         double net_worth = Double.parseDouble(strs[i+1]);
@@ -91,8 +93,57 @@ public class Connection {
             }
             Thread.sleep(10);
         }
-    }
 
+        pout.println("MY_SECURITIES");
+        pout.flush();
+        System.out.println("Getting MY Securities");
+        for(int trial = 0; trial < 100; trial++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if(line.length() > 18 && line.substring(0,18).equals("MY_SECURITIES_OUT ")) {
+                    String[] strs = line.substring(18).split(" ");
+                    trial=100;
+                    for(int i = 0; i < strs.length; i+=3) {
+                        String ticker = strs[i];
+                        int shares = Integer.parseInt(strs[i+1]);
+                        double dividend = Double.parseDouble(strs[i+2]);
+
+                        securities.get(ticker).getDividend().push(dividend);
+                        securities.get(ticker).getShares().push(shares);
+                    }
+                }
+            }
+            Thread.sleep(10);
+        }
+
+        for(String e : getSecurities()) {
+            pout.println("ORDERS " + e);
+            pout.flush();
+            System.out.println("Getting ORDERS for " + e);
+            for(int trial = 0; trial < 100; trial++) {
+                while (bin.ready()) {
+                    String line = bin.readLine();
+                    System.out.println("Recieved message: " + line);
+                    if(line.length() > 20 && line.substring(0,20).equals("SECURITY_ORDERS_OUT ")) {
+                        String[] strs = line.substring(20).split(" ");
+                        ArrayList<Order> orders = new ArrayList<>();
+                        trial=100;
+                        for(int i = 0; i < strs.length; i+=4) {
+                            boolean bid = strs[i].equals("BID");
+                            double price = Double.parseDouble(strs[i+2]);
+                            int shares = Integer.parseInt(strs[i+3]);
+
+                            orders.add(new Order(bid, price, shares));
+                        }
+                        securities.get(e).getOrders().push(orders);
+                    }
+                }
+                Thread.sleep(10);
+            }
+        }
+    }
+    
 
     public void close() throws IOException {
         pout.println("CLOSE_CONNECTION");
