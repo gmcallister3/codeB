@@ -1,4 +1,4 @@
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import java.io.*;
 
@@ -10,9 +10,13 @@ import static java.nio.file.Paths.get;
  */
 public class Test {
     public static void main(String args[]) throws IOException {
-        String content = new String(readAllBytes(get("config.json")));
-        Config config = new Gson().fromJson(content, Config.class);
-        Connection con = new Connection(config.getHost(), config.getPort(), config.getUsername(), config.getPassword());
+        // String content = new String(readAllBytes(get("config.json")));
+        // Config config = new Gson().fromJson(content, Config.class);
+        String host = "codebb.cloudapp.net";
+        int port = 17429;
+        String username = "TheWolframOfWallstreet";
+        String pword = "gm16aldy17";
+        Connection con = new Connection(host, port, username, pword);
 
         try {
             System.out.println(con.getCash());
