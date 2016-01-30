@@ -24,30 +24,29 @@ public class Main {
             HashMap<String, Double> laterP = new HashMap<>();
             long in20Minutes = 20 * 60 * 1000;
             Random rand = new Random();
-            while (in20Minutes > 0) {
+            while (true) {
                 //Logic
                 con.updateSecurities();
-                if (in20Minutes % 2 == 0) {
-                    for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++) {
                         String ticker = tickers[i];
                         Security sec = (Security) m.get(ticker);
                         initialP.put(ticker, sec.getMinAsk(0));
                     }
-                    for (int i = 0; i < 10; i++) {
-                        String ticker = tickers[i];
-                        Security sec = (Security) m.get(ticker);
-                        laterP.put(ticker, sec.getMinAsk(3));
-                    }
-                    for (int i = 0; i < 10; i++) {
-                        String ticker = tickers[i];
-                        Security sec = (Security) m.get(ticker);
-                        volatility = initialP.get(i) - laterP.get(i);
-                        if (volatility > .01) {
-                            buy(ticker, 50, sec.getMinAsk(0)+.00001, rand.nextInt(10));
-                        }
+                for (int i = 0; i < 10; i++) {
+                    String ticker = tickers[i];
+                    Security sec = (Security) m.get(ticker);
+                    laterP.put(ticker, sec.getMinAsk(3));
+                }
+                for (int i = 0; i < 10; i++) {
+                    String ticker = tickers[i];
+                    Security sec = (Security) m.get(ticker);
+                    volatility = initialP.get(i) - laterP.get(i);
+                    if (volatility > .1) {
+                        buy(ticker, rand.nextInt(10), sec.getMinAsk(0)+.00001);
+                    } else {
+                        //sell(ticker, m.get(, sec.getMaxBid(0)+.00001)
                     }
                 }
-                in20Minutes--;
             }
             con.close();
         } catch (Exception e) {
