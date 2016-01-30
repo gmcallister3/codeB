@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 
 import static java.nio.file.Files.readAllBytes;
 import static java.nio.file.Paths.get;
@@ -34,6 +35,9 @@ public class Test {
         Map m = con.getSecurityMap(); 
         HashMap<String, Double> initialP = new HashMap<>();
         HashMap<String, Double> laterP = new HashMap<>();
+
+        Timer timer = new Timer();
+        timer.schedule();
         while (true) {
             String strategy = input.nextLine();
             switch (strategy) {
@@ -53,8 +57,10 @@ public class Test {
                         Security sec = (Security) m.get(ticker);
                         laterP.put(ticker, sec.getMinAsk());
                     }
+
                     break;
-                case "sell":
+                case "money":
+                    con.getCash();
                     break;
                 case "close":
                     con.close();
