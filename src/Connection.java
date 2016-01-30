@@ -28,6 +28,7 @@ public class Connection {
         pout.flush();
 
         System.out.println("\nGetting cash");
+        
         while (bin.ready()) {
             String line = bin.readLine();
             System.out.println("Recieved message: " + line);

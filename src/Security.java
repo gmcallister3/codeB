@@ -12,4 +12,8 @@ public class Security {
 
     private double current;
 
+    public String toString() {
+    	return symbol;
+    }
+
 }
