@@ -10,6 +10,6 @@ public class Security {
     private double share_value;
     private double volatility;
 
-    private double current
+    private double current;
 
 }
