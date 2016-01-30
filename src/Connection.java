@@ -143,7 +143,46 @@ public class Connection {
             }
         }
     }
-    
+
+    public boolean buy(String ticker, int amount, double price) throws IOException, InterruptedException {
+        pout.println("BID " + ticker + " " + price + " " + amount);
+        pout.flush();
+        System.out.println("Bidding for " + ticker + " " + price + " " + amount);
+        for(int trial = 0; trial < 100; trial++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if(line.length() > 8 && line.substring(0,8).equals("BID_OUT ")) {
+                    String str = line.substring(8);
+                    trial=100;
+                    if(str.substring(0,4).equals("DONE"))
+                        return true;
+                }
+            }
+            Thread.sleep(10);
+        }
+        return false;
+    }
+
+    public boolean sell(String ticker, int amount, double price) throws IOException, InterruptedException {
+        pout.println("ASK " + ticker + " " + price + " " + amount);
+        pout.flush();
+        System.out.println("Asking for " + ticker + " " + price + " " + amount);
+        for(int trial = 0; trial < 100; trial++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if(line.length() > 8 && line.substring(0,8).equals("ASK_OUT ")) {
+                    String str = line.substring(8);
+                    trial=100;
+                    if(str.substring(0,4).equals("DONE"))
+                        return true;
+                }
+            }
+            Thread.sleep(10);
+        }
+        return false;
+    }
 
     public void close() throws IOException {
         pout.println("CLOSE_CONNECTION");

@@ -20,7 +20,7 @@ public class Test {
 
         try {
             System.out.println(con.getCash());
-            con.updateSecurities();
+            con.sell("AAPL", 1, 1);
             con.close();
         } catch (Exception e) {
             con.close();
