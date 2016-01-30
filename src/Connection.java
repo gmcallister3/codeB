@@ -64,6 +64,7 @@ public class Connection {
                     return Double.parseDouble(line.substring(12));
             }
             Thread.sleep(10);
+
         }
 
         return -1;

@@ -62,4 +62,8 @@ public class Security {
     public LinkedList<ArrayList<Order>> getOrders() {
         return orders;
     }
+
+    public String toString() {
+    	return symbol;
+    }
 }
