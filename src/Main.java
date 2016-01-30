@@ -1,5 +1,5 @@
 import java.io.IOException;
-
+import java.util.Random;
 /**
  * Created by Anthony on 1/30/2016.
  */
@@ -14,10 +14,41 @@ public class Main {
         //Connect
         Connection con = new Connection(host, port, username, pword);
 
-
         //Try
         try {
-            
+            //Scanner input = new Scanner(System.in);
+            con.updateSecurities();
+            String[] tickers = con.getSecurities();
+            Map m = con.getSecurityMap(); 
+            HashMap<String, Double> initialP = new HashMap<>();
+            HashMap<String, Double> laterP = new HashMap<>();
+            long in20Minutes = 20 * 60 * 1000;
+            Random rand = new Random();
+            while (in20Minutes > 0) {
+                //Logic
+                con.updateSecurities();
+                if (in20Minutes % 2 == 0) {
+                    for (int i = 0; i < 10; i++) {
+                        String ticker = tickers[i];
+                        Security sec = (Security) m.get(ticker);
+                        initialP.put(ticker, sec.getMinAsk(0));
+                    }
+                    for (int i = 0; i < 10; i++) {
+                        String ticker = tickers[i];
+                        Security sec = (Security) m.get(ticker);
+                        laterP.put(ticker, sec.getMinAsk(3));
+                    }
+                    for (int i = 0; i < 10; i++) {
+                        String ticker = tickers[i];
+                        Security sec = (Security) m.get(ticker);
+                        volatility = initialP.get(i) - laterP.get(i);
+                        if (volatility > .01) {
+                            buy(ticker, 50, sec.getMinAsk(0)+.00001, rand.nextInt(10));
+                        }
+                    }
+                }
+                in20Minutes--;
+            }
             con.close();
         } catch (Exception e) {
             con.close();
