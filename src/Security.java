@@ -67,8 +67,10 @@ public class Security {
     	return symbol;
     }
 
-    public double getMaxBid() {
-        ArrayList<Order> recentOrders = orders.getFirst();
+    public double getMaxBid(int t) {
+        if(t > orders.size()-1)
+            t = orders.size()-1;
+        ArrayList<Order> recentOrders = orders.get(t);
         double maxBid = 0;
         for (int i = 0; i < recentOrders.size(); i++) {
             if (recentOrders.get(i).getBid() && recentOrders.get(i).getPrice() > maxBid) {
@@ -78,8 +80,10 @@ public class Security {
         return maxBid;
     }
 
-    public double getMinAsk() {
-        ArrayList<Order> recentOrders = orders.getFirst();
+    public double getMinAsk(int t) {
+        if(t > orders.size()-1)
+            t = orders.size()-1;
+        ArrayList<Order> recentOrders = orders.get(t);
         double minAsk = 1000;
         for (int i = 0; i < recentOrders.size(); i++) {
             if (!recentOrders.get(i).getBid() && recentOrders.get(i).getPrice() < minAsk) {
