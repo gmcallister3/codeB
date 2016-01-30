@@ -66,4 +66,26 @@ public class Security {
     public String toString() {
     	return symbol;
     }
+
+    public double getMaxBid() {
+        ArrayList<Order> recentOrders = orders.getFirst();
+        double maxBid = 0;
+        for (int i = 0; i < recentOrders.size(); i++) {
+            if (recentOrders.get(i).getBid() && recentOrders.get(i).getPrice() > maxBid) {
+                maxBid = recentOrders.get(i).getPrice();
+            }
+        }
+        return maxBid;
+    }
+
+    public double getMinAsk() {
+        ArrayList<Order> recentOrders = orders.getFirst();
+        double minAsk = 1000;
+        for (int i = 0; i < recentOrders.size(); i++) {
+            if (!recentOrders.get(i).getBid() && recentOrders.get(i).getPrice() < minAsk) {
+                minAsk = recentOrders.get(i).getPrice();
+            }
+        }
+        return minAsk;
+    }
 }
