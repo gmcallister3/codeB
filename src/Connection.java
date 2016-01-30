@@ -1,4 +1,3 @@
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +10,7 @@ import java.util.Map;
  * Created by Anthony on 1/30/2016.
  */
 public class Connection {
-    Map<String, Securities> map = new HashMap<>();
+    Map<String, Security> map = new HashMap<>();
     Socket socket;
     PrintWriter pout;
     BufferedReader bin;
@@ -24,23 +23,35 @@ public class Connection {
         pout.println(username + " " + password);
     }
 
-    public String getCash() throws IOException {
+    public int getCash() throws IOException {
         pout.println("MY_CASH");
-        String ret = "";
-        while(bin.ready()) {
-            ret+=bin.readLine();
+        pout.flush();
+
+        System.out.println("\nGetting cash");
+        while (bin.ready()) {
+            String line = bin.readLine();
+            System.out.println("Recieved message: " + line);
+            if(line.substring(0,12).equals("MY_CASH_OUT "))
+                return Integer.parseInt(line.substring(12));
         }
-        return ret;
+
+        return -1;
     }
 
     public void close() throws IOException {
         pout.println("CLOSE_CONNECTION");
         pout.flush();
+
+        System.out.println("\nClosing");
         String line;
-        while ((line = bin.readLine()) != null) {
-            System.out.println(line);
+
+        while (bin.ready()) {
+            System.out.println("Recieved message: " + bin.readLine());
         }
+
         pout.close();
         bin.close();
+
+        System.out.println("Connection Closed");
     }
 }

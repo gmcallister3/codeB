@@ -22,10 +22,5 @@ public class Test {
             e.printStackTrace();
         }
 
-        System.out.println(config.getHost());
-        System.out.println(config.getPassword());
-        System.out.println(config.getPort());
-        System.out.println(config.getUsername());
-
     }
 }
