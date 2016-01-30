@@ -9,7 +9,7 @@ import static java.nio.file.Paths.get;
  * Created by Anthony on 1/30/2016.
  */
 public class Test {
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws IOException, InterruptedException {
         // String content = new String(readAllBytes(get("config.json")));
         // Config config = new Gson().fromJson(content, Config.class);
         String host = "codebb.cloudapp.net";
@@ -20,8 +20,9 @@ public class Test {
 
         try {
             System.out.println(con.getCash());
+            con.updateSecurities();
             con.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             con.close();
             e.printStackTrace();
         }

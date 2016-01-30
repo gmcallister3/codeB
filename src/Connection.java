@@ -16,7 +16,7 @@ public class Connection {
     PrintWriter pout;
     BufferedReader bin;
 
-    public Connection(String host, int port, String username, String password) throws IOException {
+    public Connection(String host, int port, String username, String password) throws IOException, InterruptedException {
         socket = new Socket(host, port);
         pout = new PrintWriter(socket.getOutputStream());
         bin = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -29,59 +29,67 @@ public class Connection {
         pout.flush();
 
         System.out.println("\nPopulating Securities");
-        while (bin.ready()) {
-            String line = bin.readLine();
-            System.out.println("Recieved message: " + line);
-            if(line.length() > 15 && line.substring(0,15).equals("SECURITIES_OUT ")) {
-                String[] strs = line.substring(15).split(" ");
-                for(int i = 0; i < strs.length; i+=4) {
-                    String ticker = strs[i];
-                    double net_worth = Double.parseDouble(strs[i+1]);
-                    double dividend_ratio = Double.parseDouble(strs[i+2]);
-                    double volatility = Double.parseDouble(strs[i+3]);
+        for(int trial = 0; trial < 100; trial ++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if(line.length() > 15 && line.substring(0,15).equals("SECURITIES_OUT ")) {
+                    trial=100;
+                    String[] strs = line.substring(15).split(" ");
+                    for(int i = 0; i < strs.length; i+=4) {
+                        String ticker = strs[i];
+                        double net_worth = Double.parseDouble(strs[i+1]);
+                        double dividend_ratio = Double.parseDouble(strs[i+2]);
+                        double volatility = Double.parseDouble(strs[i+3]);
 
-                    securities.put(ticker, new Security(ticker, volatility, dividend_ratio));
-                    securities.get(ticker).push(net_worth,0.0,0, new ArrayList());
+                        securities.put(ticker, new Security(ticker, volatility, dividend_ratio));
+                        securities.get(ticker).push(net_worth,0.0,0, new ArrayList());
+                    }
                 }
             }
+            Thread.sleep(10);
         }
     }
 
-    public int getCash() throws IOException {
+    public double getCash() throws IOException, InterruptedException {
         pout.println("MY_CASH");
         pout.flush();
 
         System.out.println("\nGetting cash");
-        while (bin.ready()) {
-            String line = bin.readLine();
-            System.out.println("Recieved message: " + line);
-            if(line.length() > 12 && line.substring(0,12).equals("MY_CASH_OUT "))
-                return Integer.parseInt(line.substring(12));
+        for(int i = 0; i < 100; i++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if (line.length() > 12 && line.substring(0, 12).equals("MY_CASH_OUT "))
+                    return Double.parseDouble(line.substring(12));
+            }
+            Thread.sleep(10);
         }
 
         return -1;
     }
 
-    public void updateSecurities() throws IOException {
+    public void updateSecurities() throws IOException, InterruptedException {
         pout.println("SECURITIES");
         pout.flush();
 
         System.out.println("\nGetting Securities");
-        while (bin.ready()) {
-            String line = bin.readLine();
-            System.out.println("Recieved message: " + line);
-            if(line.length() > 15 && line.substring(0,15).equals("SECURITIES_OUT ")) {
-                String[] strs = line.substring(15).split(" ");
-                for(int i = 0; i < strs.length; i+=4) {
-                    String ticker = strs[i];
-                    double net_worth = Double.parseDouble(strs[i+1]);
+        for(int trial = 0; trial < 100; trial++) {
+            while (bin.ready()) {
+                String line = bin.readLine();
+                System.out.println("Recieved message: " + line);
+                if(line.length() > 15 && line.substring(0,15).equals("SECURITIES_OUT ")) {
+                    String[] strs = line.substring(15).split(" ");
+                    for(int i = 0; i < strs.length; i+=4) {
+                        String ticker = strs[i];
+                        double net_worth = Double.parseDouble(strs[i+1]);
 
-                    securities.get(ticker).getNet_worth().push(net_worth);
+                        securities.get(ticker).getNet_worth().push(net_worth);
+                    }
                 }
             }
+            Thread.sleep(10);
         }
-
-
     }
 
 
@@ -100,5 +108,13 @@ public class Connection {
         bin.close();
 
         System.out.println("Connection Closed");
+    }
+
+    public String[] getSecurities() {
+        return securities.keySet().toArray(new String[securities.size()]);
+    }
+
+    public Map getSecurityMap() {
+        return securities;
     }
 }
